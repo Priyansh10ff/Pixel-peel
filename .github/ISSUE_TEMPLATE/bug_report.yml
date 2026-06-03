@@ -1,0 +1,77 @@
+name: "🐛 Bug Report"
+description: "Something isn't working correctly"
+title: "[Bug]: "
+labels: ["bug", "triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much detail as possible.
+
+  - type: input
+    id: version
+    attributes:
+      label: PixelPeel Version
+      placeholder: "e.g. 1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS Sonoma (14)
+        - macOS Ventura (13)
+        - macOS Monterey (12)
+        - Ubuntu 24.04
+        - Ubuntu 22.04
+        - Other Linux
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python Version
+      placeholder: "e.g. 3.11.8"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      placeholder: "A clear description of what went wrong."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Open PixelPeel
+        2. Load image '...'
+        3. Click 'Remove Background'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      placeholder: "What did you expect to happen?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Output / Logs
+      render: shell
+      placeholder: "Paste terminal output or error messages here."

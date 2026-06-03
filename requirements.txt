@@ -1,0 +1,19 @@
+# ─────────────────────────────────────────────────────────────
+#  PixelPeel — Python dependencies
+#  Install:  pip install -r requirements.txt
+# ─────────────────────────────────────────────────────────────
+
+# ── Core AI / image processing ────────────────────────────────
+rembg>=2.0.57
+onnxruntime>=1.17.0          # CPU inference (default)
+Pillow>=10.3.0
+numpy>=1.26.0
+
+# ── Desktop UI ────────────────────────────────────────────────
+customtkinter>=5.2.2
+
+# ── Optional: GPU inference (uncomment if you have CUDA) ─────
+# onnxruntime-gpu>=1.17.0    # replaces onnxruntime above
+
+# ── Optional: native drag-and-drop ───────────────────────────
+# tkinterdnd2>=0.3.0
