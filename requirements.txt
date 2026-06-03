@@ -9,6 +9,12 @@ onnxruntime>=1.17.0          # CPU inference (default)
 Pillow>=10.3.0
 numpy>=1.26.0
 
+# ── Numba pinned for Python 3.12 compatibility ────────────────
+# pymatting (rembg dependency) requires numba. Version 0.59+
+# is required for Python 3.12. NUMBA_DISABLE_JIT=1 (set in
+# main.py) disables JIT so it never hangs at startup anyway.
+numba>=0.59.0
+
 # ── Desktop UI ────────────────────────────────────────────────
 customtkinter>=5.2.2
 
