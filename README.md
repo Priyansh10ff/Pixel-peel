@@ -1,7 +1,5 @@
 <div align="center">
 
-<br/>
-
 ```
 ██████╗ ██╗██╗  ██╗███████╗██╗     ██████╗ ███████╗███████╗██╗
 ██╔══██╗██║╚██╗██╔╝██╔════╝██║     ██╔══██╗██╔════╝██╔════╝██║
@@ -11,352 +9,291 @@
 ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     ╚══════╝╚══════╝╚══════╝
 ```
 
-### AI-Powered Background Remover — 100% Local · Zero Cloud · Zero Compromise
+### ◆ Professional background removal. No cloud. No AI. No compromise.
+
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![OpenCV](https://img.shields.io/badge/Powered%20by-OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white)](https://opencv.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-7C6FF7?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-4ECDC4?style=flat-square)](README.md)
+[![No AI](https://img.shields.io/badge/AI-Free-success?style=flat-square)](README.md)
 
 <br/>
 
-[![CI](https://github.com/yourusername/pixelpeel/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/pixelpeel/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://python.org)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?logo=windows&logoColor=white)](https://github.com/yourusername/pixelpeel)
-[![License: MIT](https://img.shields.io/badge/License-MIT-6C5CE7.svg)](LICENSE)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
-<br/>
-
-> **Your images stay on your machine. Always.**
->
-> PixelPeel removes backgrounds using state-of-the-art deep learning — entirely offline,
-> with no API keys, no subscriptions, and no data ever leaving your PC.
-
-<br/>
+**[🚀 Quick Install](#-installation) · [✨ Features](#-features) · [🧠 How It Works](#-how-it-works) · [🖥️ Screenshots](#%EF%B8%8F-screenshots) · [🤝 Contributing](#-contributing)**
 
 </div>
 
 ---
 
-## Table of Contents
+## ✨ Features
 
-- [Why PixelPeel?](#-why-pixelpeel)
-- [Features](#-features)
-- [Quick Start](#-quick-start)
-- [Installation](#-installation)
-- [Usage Guide](#-usage-guide)
-- [AI Models](#-ai-models)
-- [Themes](#-themes)
-- [Project Structure](#-project-structure)
-- [Running Tests](#-running-tests)
-- [Contributing](#-contributing)
-- [Roadmap](#-roadmap)
-- [License](#-license)
+<table>
+<tr>
+<td width="50%">
 
----
+**🔒 Fully Private**
+Your images never leave your machine. No API calls,
+no telemetry, no network connection needed — ever.
 
-## ✦ Why PixelPeel?
+**🧠 Zero AI / Zero Downloads**
+Powered by OpenCV's GrabCut algorithm — pure classical
+computer vision. No ONNX models, no neural nets to download.
 
-Most background-removal tools send your images to a remote server for processing.
-This is a problem when working with sensitive, proprietary, or personal imagery.
+**📦 Batch Processing**
+Drop an entire folder and process all images in one click.
+Progress tracking per file with real-time status badges.
 
-PixelPeel solves this completely. After a one-time model download (~170 MB),
-**every single operation runs on your own CPU or GPU**, with zero network traffic.
+**🎨 4 Removal Algorithms**
+Switch between GrabCut, GrabCut HD, Edge Refine, and
+Color Range — each tuned for a different type of subject.
 
-| | PixelPeel | Cloud tools |
-|---|---|---|
-| **Privacy** | ✅ 100% local — images never leave your machine | ❌ Uploaded to remote servers |
-| **Cost** | ✅ Free forever, no account needed | ❌ Subscription or per-image fees |
-| **Offline** | ✅ Works without internet after setup | ❌ Requires connectivity |
-| **Speed** | ✅ No upload/download latency | ❌ Dependent on network speed |
-| **Batch** | ✅ Unlimited images, no rate limits | ❌ Often capped per plan |
+</td>
+<td width="50%">
 
----
+**🖼️ Before / After Split View**
+Drag the divider left and right to compare the original
+and processed image side-by-side in real time.
 
-## ✦ Features
+**🌓 Dark & Light Themes**
+Frost (light) and Midnight (dark) palettes — toggle
+instantly from the sidebar.
 
-### Core
-- **Single-image mode** — process one image at a time with a live before/after preview
-- **Batch mode** — queue individual files or entire folders; per-row status tracking
-- **Interactive split-preview** — drag the slider to compare original and result side by side
-- **Four AI models** — choose the right engine for your use case (see [AI Models](#-ai-models))
-- **Three output formats** — `PNG` (transparent), `JPEG`, `WEBP`
-- **Background fill** — keep it transparent, fill with white, or pick any custom colour
+**📸 Multi-Format Output**
+Save as PNG (transparent), JPEG (white or custom BG),
+or WebP — with optional custom background colour.
 
-### UI / UX
-- **Dual themes** — toggle between **Midnight** (dark) and **Frost** (light) instantly
-- **Animated progress bar** — real-time percentage feedback during processing
-- **Status bar** — active model name, total processed count, app version
-- **Drag-and-drop** *(requires `tkinterdnd2`)* — drop files directly onto the window
-- **Responsive layout** — resizes gracefully from 900×580 to full screen
+**🖥️ One-Click Desktop App**
+A single install script wires up a native desktop shortcut.
+Double-click to open. No terminal, no scripts, ever again.
 
-### Developer
-- **Full test suite** — 20+ unit tests covering the processor, save logic, and session caching
-- **GitHub Actions CI** — lint + test matrix across Python 3.9–3.12 on Windows, macOS, Linux
-- **Type-annotated source** — fully typed with `from __future__ import annotations`
-- **Zero vendor lock-in** — built on open-source libraries with no proprietary dependencies
+</td>
+</tr>
+</table>
 
 ---
 
-## ✦ Quick Start
+## 🖥️ Screenshots
 
-### Windows
+> _Launch the app and go — the interface is self-explanatory._
+
+```
+┌─────────────────────┬──────────────────────────────────────────────┐
+│  ◆  PixelPeel       │  [ Single Image ]  [ Batch ]                 │
+│                     │                                               │
+│  ── CV ALGORITHM ── │  ┌────────────────────────────────────────┐  │
+│  ◉ GrabCut          │  │                                        │  │
+│  ○ GrabCut HD       │  │       Drop image here  or  Browse      │  │
+│  ○ Edge Refine      │  │                                        │  │
+│  ○ Color Range      │  │   Before ◀──────────────▶ After        │  │
+│                     │  │                                        │  │
+│  ── FORMAT ──       │  └────────────────────────────────────────┘  │
+│  [PNG] [JPEG][WEBP] │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░  72%           │
+│                     │                                               │
+│  ── BACKGROUND ──   │  [ Remove Background ]                       │
+│  [Transparent]      │                                               │
+│  [  White    ]      ├──────────────────────────────────────────────┤
+│  [  Custom   ]      │  ●  Ready  │  Mode: grabcut  │  0 processed  │
+└─────────────────────┴──────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Installation
+
+### 🪟 Windows
+
+1. Download or clone this repository
+2. Double-click **`install.bat`**
+
+That's it. A **PixelPeel** shortcut appears on your Desktop.
+Click it to launch — no terminal, no scripts, no Python PATH juggling.
 
 ```batch
-git clone https://github.com/Priyansh10ff/Pixel-peel
-cd pixelpeel
-install_and_run.bat
+:: What install.bat does under the hood:
+1. Detects your Python 3.9+ installation
+2. Creates an isolated .venv inside the project folder
+3. Installs only 4 lightweight packages (OpenCV, Pillow, CustomTkinter, NumPy)
+4. Generates a native .ico icon via Pillow
+5. Writes a silent VBScript launcher (no console window)
+6. Pins a .lnk shortcut to your Desktop via PowerShell
 ```
 
-### macOS / Linux
+### 🍎 macOS
 
 ```bash
-git clone https://github.com/Priyansh10ff/Pixel-peel
-cd pixelpeel
-chmod +x install_and_run.sh && ./install_and_run.sh
+chmod +x install.sh && ./install.sh
 ```
 
-> **First launch:** The selected AI model (~170 MB) downloads once and is cached at
-> `~/.u2net/`. All subsequent launches are fully offline.
+A **PixelPeel.app** appears on your Desktop.
+Drag it to `/Applications` to keep it permanently.
 
----
-
-## ✦ Installation
-
-### Prerequisites
-
-| Requirement | Version |
-|---|---|
-| Python | 3.9 or newer |
-| pip | latest recommended |
-| OS | Windows 10/11, macOS 12+, Ubuntu 20.04+ |
-
-### Step-by-step
+### 🐧 Linux
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/Priyansh10ff/Pixel-peel
-cd pixelpeel
-
-# 2. (Recommended) Create a virtual environment
-python -m venv .venv
-source .venv/bin/activate      # macOS / Linux
-.venv\Scripts\activate         # Windows
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Launch PixelPeel
-python main.py
+chmod +x install.sh && ./install.sh
 ```
 
-### Optional: GPU Acceleration
+PixelPeel registers in your application launcher (GNOME / KDE / XFCE)
+and drops a `.desktop` shortcut on your Desktop.
 
-If you have an NVIDIA GPU with CUDA, replace `onnxruntime` with the GPU variant for
-significantly faster inference:
+---
 
-```bash
-pip uninstall onnxruntime -y
-pip install onnxruntime-gpu
+## 🧠 How It Works
+
+PixelPeel uses **classical computer vision** — no neural networks, no model files, no GPU needed.
+
+### The Algorithms
+
+| Algorithm | Best For | Speed | Quality |
+|---|---|---|---|
+| **GrabCut** | General subjects, portraits, products | ⚡ Fast | ★★★★☆ |
+| **GrabCut HD** | Complex edges — hair, fur, foliage | 🐢 Slower | ★★★★★ |
+| **Edge Refine** | Geometric objects with sharp outlines | ⚡ Fast | ★★★★☆ |
+| **Color Range** | Solid or gradient backgrounds | ⚡⚡ Fastest | ★★★☆☆ |
+
+### GrabCut — the core algorithm
+
+```
+1.  Seed the algorithm with a rectangle covering the centre ~82%
+    of the image as "probable foreground".
+
+2.  Model foreground and background as separate Gaussian Mixture
+    Models (GMMs) in colour space.
+
+3.  Build a Markov Random Field (MRF) graph: every pixel is a node;
+    edges carry both colour and spatial smoothness costs.
+
+4.  Solve with min-cut / max-flow to label each pixel FG or BG.
+
+5.  Re-estimate GMMs from the new labels and repeat (5 iterations
+    for Standard, 12 for HD).
+
+6.  Optionally re-run with a trimap derived from the rough mask to
+    sharpen transition pixels (GrabCut HD only).
+
+7.  Apply a 2-pixel Gaussian blur to the alpha mask for soft edges.
 ```
 
-### Optional: Native Drag-and-Drop
-
-```bash
-pip install tkinterdnd2
-```
+**Why no AI?** GrabCut runs in pure C++ inside OpenCV — zero Python ML
+frameworks, zero downloads after `pip install opencv-python`, and deterministic
+results that are reproducible across every machine.
 
 ---
 
-## ✦ Usage Guide
-
-### Single Image
-
-1. Launch PixelPeel — the **Single Image** tab is active by default.
-2. **Click the drop zone** (or drag a file onto it if `tkinterdnd2` is installed).
-3. Select your AI model and output settings in the left sidebar.
-4. Click **▶ Remove Background**.
-5. Drag the **split-preview slider** to compare the original and result.
-6. Click **💾 Save Result** to export to a custom location, or find the auto-saved
-   file in your configured output folder.
-
-### Batch Processing
-
-1. Switch to the **Batch Process** tab.
-2. Click **＋ Add Images** to select individual files, or **📁 Add Folder** to enqueue
-   an entire directory.
-3. Verify the output folder in the sidebar.
-4. Click **▶ Process All** — each row updates with ✓ (success) or ✗ (error) in real time.
-
-### Sidebar Controls
-
-| Control | Description |
-|---|---|
-| **AI Model** | Choose between Standard, Portrait, Precision, or Ultra |
-| **Output Format** | PNG (transparent) · JPEG · WEBP |
-| **Background** | Transparent · White · Custom colour picker |
-| **Output Folder** | Click 📁 to browse, or type a path directly |
-| **☀ / 🌙 button** | Toggle Frost / Midnight theme |
-
----
-
-## ✦ AI Models
-
-PixelPeel exposes four inference models via [rembg](https://github.com/danielgatis/rembg).
-All models are downloaded once and cached locally.
-
-| Model | Name in UI | Best For | Speed | Quality |
-|---|---|---|---|---|
-| `u2net` | **Standard** | General images, products, animals | ⚡⚡⚡ Fast | ★★★★ |
-| `u2net_human_seg` | **Portrait** | Selfies, portraits, people | ⚡⚡⚡ Fast | ★★★★ |
-| `isnet-general-use` | **Precision** | Complex edges, hair, fur, fine detail | ⚡⚡ Medium | ★★★★★ |
-| `birefnet-general` | **Ultra** | Maximum fidelity, professional use | ⚡ Slower | ★★★★★ |
-
-> **Tip:** Start with **Standard**. Switch to **Precision** or **Ultra** only when
-> edges need extra sharpness — they produce exceptional results but take longer,
-> especially on CPU.
-
----
-
-## ✦ Themes
-
-PixelPeel ships with two hand-crafted colour palettes toggled instantly with the
-`☀ / 🌙` button in the top-right corner of the sidebar.
-
-### 🌙 Midnight (Dark)
-Deep-space background (`#0D0D0F`) with electric violet (`#7C6FF7`) and mint (`#4ECDC4`)
-accents. Easy on the eyes during long sessions.
-
-### ☀ Frost (Light)
-Arctic white surfaces (`#F0F3FA`) with violet (`#6C5CE7`) and teal (`#00B894`) accents.
-Clean and airy for bright environments.
-
-Both themes adapt every surface — sidebar, cards, canvas, status bar, progress bars,
-labels, and buttons — without requiring an app restart.
-
----
-
-## ✦ Project Structure
+## 🗂️ Project Structure
 
 ```
 pixelpeel/
 │
-├── main.py                         # Entry point: version check → launch
+├── main.py                   Entry point — version + dep checks, then launches UI
+├── install.bat               Windows: one-click installer + Desktop shortcut
+├── install.sh                macOS/Linux: one-click installer + .app / .desktop
+├── requirements.txt          4 dependencies (opencv, pillow, customtkinter, numpy)
+├── pyproject.toml            Build metadata & tool config (ruff, black, pytest)
+│
+├── assets/
+│   └── create_icon.py        Generates pixelpeel.ico / .png from code (no asset files)
 │
 ├── src/
 │   ├── __init__.py
-│   ├── processor.py                # AI engine — rembg wrapper + model management
+│   ├── processor.py          ◀ Core CV engine — GrabCut, Edge Refine, Color Range
 │   └── ui/
 │       ├── __init__.py
-│       ├── app.py                  # PixelPeelApp — full UI (single + batch + preview)
-│       └── themes.py               # Colour palette (Midnight / Frost) + helpers
+│       ├── app.py            CustomTkinter GUI — sidebar, tabs, split preview, batch
+│       └── themes.py         Frost (light) + Midnight (dark) colour palettes
 │
-├── tests/
-│   ├── __init__.py
-│   └── test_processor.py           # 20+ unit tests — no GPU required (rembg mocked)
-│
-├── output/                         # Default output directory
-│   └── .gitkeep
-│
-├── .github/
-│   ├── workflows/
-│   │   └── ci.yml                  # CI: lint → test matrix (3 OS × 4 Python versions)
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.yml
-│   │   └── feature_request.yml
-│   └── PULL_REQUEST_TEMPLATE.md
-│
-├── install_and_run.bat             # Windows one-click installer + launcher
-├── install_and_run.sh              # macOS / Linux one-click installer + launcher
-├── requirements.txt                # Runtime dependencies
-├── pyproject.toml                  # Build metadata, tool config (black, ruff, pytest)
-├── CHANGELOG.md                    # Version history (Keep a Changelog format)
-├── CONTRIBUTING.md                 # Contributor guide
-└── LICENSE                         # MIT
+└── tests/
+    ├── __init__.py
+    └── test_processor.py     Unit tests — real CV on synthetic images, no mocks
 ```
 
 ---
 
-## ✦ Running Tests
+## 🔧 Manual / Developer Setup
+
+If you prefer to manage the environment yourself:
 
 ```bash
-# Install dev dependencies
-pip install pytest pytest-cov
-
-# Run all tests
-pytest tests/ -v
-
-# Run with coverage report
-pytest tests/ -v --cov=src --cov-report=term-missing
-
-# Run a specific class
-pytest tests/test_processor.py::TestApplyBg -v
-
-# Run a specific test
-pytest tests/test_processor.py::TestSave::test_saves_png -v
-```
-
-All tests mock `rembg` and `onnxruntime` — no GPU, no model download, no internet
-required. Safe to run in any CI environment.
-
----
-
-## ✦ Contributing
-
-Contributions are warmly welcomed! Please read [CONTRIBUTING.md](CONTRIBUTING.md)
-for the full guide, including:
-
-- Development environment setup
-- Code style requirements (`ruff` + `black`)
-- How to run tests
-- PR checklist
-
-To get started quickly:
-
-```bash
-git clone https://github.com/Priyansh10ff/Pixel-peel
+# Clone
+git clone https://github.com/yourusername/pixelpeel.git
 cd pixelpeel
-pip install -r requirements.txt ruff black pytest pytest-cov
-git checkout -b feat/your-feature
+
+# Create venv
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+
+# Install
+pip install -r requirements.txt
+
+# Run
+python main.py
+```
+
+### Running the Tests
+
+```bash
+pip install pytest pytest-cov
+pytest                             # all tests
+pytest -v tests/test_processor.py # verbose
+pytest --cov=src                   # with coverage
+```
+
+### Optional: GPU-accelerated OpenCV
+
+```bash
+# Replace the CPU build with the CUDA variant (requires CUDA toolkit)
+pip uninstall opencv-python
+pip install opencv-contrib-python  # or build from source with CUDA
 ```
 
 ---
 
-## ✦ Roadmap
+## 📦 Dependencies
 
-The following improvements are planned for future releases:
+| Package | Version | Purpose |
+|---|---|---|
+| `opencv-python` | ≥ 4.8 | GrabCut, Canny edge, morphology |
+| `Pillow` | ≥ 10.3 | Image I/O, compositing, icon generation |
+| `customtkinter` | ≥ 5.2.2 | Modern Tk-based GUI widgets |
+| `numpy` | ≥ 1.26 | Array operations for mask processing |
 
-- [ ] **CLI mode** — headless usage via `pixelpeel --input img.jpg --output out.png`
-- [ ] **Keyboard shortcuts** — `Space` to process, `Ctrl+S` to save, `Ctrl+O` to open
-- [ ] **Export presets** — save and reuse model + format + background combinations
-- [ ] **HEIC / AVIF input** — support for Apple and modern web formats
-- [ ] **Custom background image** — composite the subject onto any background photo
-- [ ] **Zoom & pan** in the preview panel
-- [ ] **Undo / Redo** stack
-
-Want to work on one of these? Check [open issues](https://github.com/yourusername/pixelpeel/issues)
-or open a new feature request.
+That's it — **four packages**, all pure Python wheels. No ONNX Runtime, no TensorFlow, no PyTorch.
 
 ---
 
-## ✦ License
+## 🤝 Contributing
 
-PixelPeel is released under the **MIT License**. See [LICENSE](LICENSE) for the full text.
+Contributions are welcome! Please:
 
-This project builds on excellent open-source work:
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feat/my-feature`
+3. **Commit** with clear messages: `git commit -m "feat: add watershed algorithm"`
+4. **Test** your changes: `pytest`
+5. **Open** a Pull Request — fill in the template
 
-| Library | License |
-|---|---|
-| [rembg](https://github.com/danielgatis/rembg) | MIT |
-| [ONNX Runtime](https://github.com/microsoft/onnxruntime) | MIT |
-| [Pillow](https://github.com/python-pillow/Pillow) | HPND |
-| [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) | MIT |
-| [NumPy](https://numpy.org) | BSD-3-Clause |
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+
+### Ideas & Roadmap
+
+- [ ] Trimap painting tool (manual foreground/background hints)
+- [ ] Watershed segmentation algorithm
+- [ ] Hair / fine-detail matting refinement pass
+- [ ] Drag-and-drop support via `tkinterdnd2`
+- [ ] Export preset presets (e-commerce, profile photo, etc.)
+- [ ] CLI mode: `pixelpeel input.jpg output.png`
+
+---
+
+## 📄 License
+
+MIT © 2024 PixelPeel — see [LICENSE](LICENSE) for full text.
 
 ---
 
 <div align="center">
 
-Built with Python · Runs locally · Zero compromise on privacy
+**Made with ♥ and OpenCV — zero cloud, zero compromise.**
 
-**[⭐ Star this repo](https://github.com/yourusername/pixelpeel)** if PixelPeel saved you time!
+*If PixelPeel saved you time, give it a ⭐*
 
 </div>

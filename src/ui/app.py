@@ -74,7 +74,7 @@ class PixelPeelApp(ctk.CTk):
         self._dz_hovered: bool = False
 
         # ── settings vars ──────────────────────────────────────────────
-        self.model_var  = ctk.StringVar(value="u2net")
+        self.model_var  = ctk.StringVar(value="grabcut")
         self.format_var = ctk.StringVar(value="PNG")
         self.bg_opt_var = ctk.StringVar(value="Transparent")
         self.bg_hex: str = "#FFFFFF"
@@ -167,16 +167,16 @@ class PixelPeelApp(ctk.CTk):
         self._divider(sb, row=1)
 
         # ── AI Model ───────────────────────────────────────────────────
-        self._section_label(sb, row=2, text="AI MODEL")
+        self._section_label(sb, row=2, text="CV ALGORITHM")
 
         models_f = ctk.CTkFrame(sb, fg_color="transparent")
         models_f.grid(row=3, column=0, sticky="ew", padx=18, pady=(0, 4))
 
         _model_defs = [
-            ("u2net",             "Standard",  "Best balance of speed & quality"),
-            ("u2net_human_seg",   "Portrait",  "Optimised for people & selfies"),
-            ("isnet-general-use", "Precision", "High-detail edges & objects"),
-            ("birefnet-general",  "Ultra",     "Finest quality  •  slower"),
+            ("grabcut",        "GrabCut",      "Best balance of speed & quality"),
+            ("grabcut_detail", "GrabCut HD",   "Finer edges  •  more iterations"),
+            ("edge_refined",   "Edge Refine",  "Canny edges + morphology blend"),
+            ("color_range",    "Color Range",  "Best for solid/gradient backgrounds"),
         ]
         for i, (key, label, desc) in enumerate(_model_defs):
             card = ctk.CTkFrame(models_f, fg_color=COLORS["card"], corner_radius=8)
@@ -683,7 +683,7 @@ class PixelPeelApp(ctk.CTk):
         )
 
         self._model_lbl = ctk.CTkLabel(
-            sb, text="Model: u2net",
+            sb, text="Mode: grabcut",
             font=ctk.CTkFont(size=11), text_color=COLORS["subtext"],
         )
         self._model_lbl.pack(side="left", padx=12)
@@ -736,12 +736,12 @@ class PixelPeelApp(ctk.CTk):
 
     def _on_model_change(self) -> None:
         labels = {
-            "u2net": "u2net",
-            "u2net_human_seg": "u2net-human",
-            "isnet-general-use": "isnet",
-            "birefnet-general": "birefnet",
+            "grabcut":        "grabcut",
+            "grabcut_detail": "grabcut-hd",
+            "edge_refined":   "edge-refine",
+            "color_range":    "color-range",
         }
-        self._model_lbl.configure(text=f"Model: {labels.get(self.model_var.get())}")
+        self._model_lbl.configure(text=f"Mode: {labels.get(self.model_var.get())}")
 
     def _on_format_change(self, value: str) -> None:
         if value == "JPEG" and self.bg_opt_var.get() == "Transparent":

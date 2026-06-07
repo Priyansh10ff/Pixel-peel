@@ -1,27 +1,29 @@
 """
 PixelPeel — Test Suite
 =======================
-Tests for the BackgroundProcessor without requiring a GPU or real rembg
-inference (mocked). Safe to run in any CI environment.
+Tests for BackgroundProcessor without a display or GPU.
+All OpenCV calls use real algorithms on synthetic images —
+no mocking needed because GrabCut works on tiny arrays.
 """
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
+import cv2
+import numpy as np
 import pytest
 from PIL import Image
 
-# Ensure project root is on sys.path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.processor import BackgroundProcessor
+from src.processor import BackgroundProcessor, _smooth_alpha
 
-# ─────────────────────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────────────────────
 #  Fixtures
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 @pytest.fixture()
@@ -31,215 +33,226 @@ def proc() -> BackgroundProcessor:
 
 @pytest.fixture()
 def rgb_image(tmp_path: Path) -> Path:
-    """A 100×100 red JPEG on disk."""
+    """100×100 red JPEG."""
     p = tmp_path / "red.jpg"
-    Image.new("RGB", (100, 100), (255, 0, 0)).save(str(p), "JPEG")
+    Image.new("RGB", (100, 100), (220, 60, 60)).save(str(p), "JPEG")
     return p
 
 
 @pytest.fixture()
 def rgba_image(tmp_path: Path) -> Path:
-    """A 100×100 semi-transparent PNG on disk."""
+    """100×100 semi-transparent PNG."""
     p = tmp_path / "semi.png"
-    img = Image.new("RGBA", (100, 100), (0, 128, 255, 180))
-    img.save(str(p), "PNG")
+    Image.new("RGBA", (100, 100), (0, 128, 255, 180)).save(str(p), "PNG")
     return p
 
 
-def _make_mock_remove(output: Image.Image):
-    """Return a mock for rembg.remove that always returns *output*."""
-    return MagicMock(return_value=output)
+@pytest.fixture()
+def gradient_image(tmp_path: Path) -> Path:
+    """100×100 image: white border, red centre — ideal for GrabCut."""
+    arr = np.ones((100, 100, 3), dtype=np.uint8) * 240   # light grey BG
+    arr[20:80, 20:80] = [200, 50, 50]                    # red FG
+    p = tmp_path / "grad.png"
+    cv2.imwrite(str(p), arr)
+    return p
 
 
-# ─────────────────────────────────────────────────────────────
-#  BackgroundProcessor.MODELS
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+#  MODELS dict
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 class TestModels:
-    def test_four_models_defined(self, proc):
+    def test_four_models(self, proc):
         assert len(proc.MODELS) == 4
 
-    def test_model_keys_are_strings(self, proc):
-        for k in proc.MODELS:
-            assert isinstance(k, str)
+    def test_expected_keys(self, proc):
+        assert set(proc.MODELS) == {
+            "grabcut", "grabcut_detail", "edge_refined", "color_range"
+        }
 
-    def test_model_descriptions_non_empty(self, proc):
+    def test_descriptions_non_empty(self, proc):
         for v in proc.MODELS.values():
             assert len(v) > 0
 
 
-# ─────────────────────────────────────────────────────────────
-#  BackgroundProcessor._apply_bg
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+#  _apply_bg
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 class TestApplyBg:
-    def _rgba(self, size=(10, 10)) -> Image.Image:
-        img = Image.new("RGBA", size, (100, 150, 200, 200))
-        return img
+    def _rgba(self) -> Image.Image:
+        return Image.new("RGBA", (20, 20), (100, 150, 200, 180))
 
     def test_transparent_png_stays_rgba(self):
         out = BackgroundProcessor._apply_bg(self._rgba(), None, "PNG")
         assert out.mode == "RGBA"
 
-    def test_white_bg_converts_to_rgb_for_jpeg(self):
-        out = BackgroundProcessor._apply_bg(self._rgba(), (255, 255, 255), "JPEG")
-        assert out.mode == "RGB"
-
-    def test_custom_bg_applied(self):
-        bg = (0, 255, 0)
-        out = BackgroundProcessor._apply_bg(self._rgba(), bg, "PNG")
-        # Output should be RGBA with green background where alpha was < 255
-        assert out.mode == "RGBA"
-
-    def test_jpeg_without_bg_still_produces_rgb(self):
+    def test_jpeg_no_bg_becomes_rgb(self):
         out = BackgroundProcessor._apply_bg(self._rgba(), None, "JPEG")
         assert out.mode == "RGB"
 
-    def test_webp_with_no_bg_stays_rgba(self):
+    def test_custom_bg_applied_png(self):
+        out = BackgroundProcessor._apply_bg(self._rgba(), (0, 255, 0), "PNG")
+        assert out.mode == "RGBA"
+
+    def test_custom_bg_jpeg_is_rgb(self):
+        out = BackgroundProcessor._apply_bg(self._rgba(), (255, 255, 255), "JPEG")
+        assert out.mode == "RGB"
+
+    def test_webp_transparent_stays_rgba(self):
         out = BackgroundProcessor._apply_bg(self._rgba(), None, "WEBP")
         assert out.mode == "RGBA"
 
 
-# ─────────────────────────────────────────────────────────────
-#  BackgroundProcessor._save
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+#  _save
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 class TestSave:
-    def _rgba(self) -> Image.Image:
-        return Image.new("RGBA", (20, 20), (10, 20, 30, 255))
-
-    def _rgb(self) -> Image.Image:
-        return Image.new("RGB", (20, 20), (10, 20, 30))
-
     def test_saves_png(self, tmp_path):
         p = tmp_path / "out.png"
-        BackgroundProcessor._save(self._rgba(), str(p), "PNG")
+        BackgroundProcessor._save(Image.new("RGBA", (20, 20)), str(p), "PNG")
         assert p.exists()
-        assert Image.open(p).mode == "RGBA"
 
     def test_saves_jpeg(self, tmp_path):
         p = tmp_path / "out.jpg"
-        BackgroundProcessor._save(self._rgb(), str(p), "JPEG")
+        BackgroundProcessor._save(Image.new("RGB", (20, 20)), str(p), "JPEG")
         assert p.exists()
-        img = Image.open(p)
-        assert img.mode == "RGB"
+        assert Image.open(p).mode == "RGB"
 
     def test_saves_webp(self, tmp_path):
         p = tmp_path / "out.webp"
-        BackgroundProcessor._save(self._rgba(), str(p), "WEBP")
+        BackgroundProcessor._save(Image.new("RGBA", (20, 20)), str(p), "WEBP")
         assert p.exists()
 
     def test_creates_parent_dirs(self, tmp_path):
-        deep = tmp_path / "a" / "b" / "c" / "out.png"
-        BackgroundProcessor._save(self._rgba(), str(deep), "PNG")
+        deep = tmp_path / "a" / "b" / "out.png"
+        BackgroundProcessor._save(Image.new("RGBA", (10, 10)), str(deep), "PNG")
         assert deep.exists()
 
 
-# ─────────────────────────────────────────────────────────────
-#  BackgroundProcessor.remove_background  (mocked rembg)
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+#  remove_background — real CV (no mocks)
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 class TestRemoveBackground:
-    def _mock_session(self):
-        return MagicMock()
-
-    def _transparent_result(self) -> Image.Image:
-        img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
-        return img
-
-    @patch("src.processor.BackgroundProcessor._get_session")
-    def test_png_output_created(self, mock_sess, proc, rgb_image, tmp_path):
-        mock_sess.return_value = self._mock_session()
-
-        with patch("rembg.remove", _make_mock_remove(self._transparent_result())):
-            out = tmp_path / "result.png"
-            result = proc.remove_background(
-                str(rgb_image), str(out), output_format="PNG"
-            )
-
-        assert result is True
+    def test_png_output_created(self, proc, gradient_image, tmp_path):
+        out = tmp_path / "result.png"
+        ok = proc.remove_background(str(gradient_image), str(out), output_format="PNG")
+        assert ok is True
         assert out.exists()
 
-    @patch("src.processor.BackgroundProcessor._get_session")
-    def test_jpeg_output_created(self, mock_sess, proc, rgb_image, tmp_path):
-        mock_sess.return_value = self._mock_session()
-
-        with patch("rembg.remove", _make_mock_remove(self._transparent_result())):
-            out = tmp_path / "result.jpg"
-            result = proc.remove_background(
-                str(rgb_image), str(out),
-                output_format="JPEG", bg_color=(255, 255, 255),
-            )
-
-        assert result is True
+    def test_jpeg_output_created(self, proc, gradient_image, tmp_path):
+        out = tmp_path / "result.jpg"
+        ok = proc.remove_background(
+            str(gradient_image), str(out),
+            output_format="JPEG", bg_color=(255, 255, 255),
+        )
+        assert ok is True
         assert out.exists()
 
-    @patch("src.processor.BackgroundProcessor._get_session")
-    def test_progress_callback_called(self, mock_sess, proc, rgb_image, tmp_path):
-        mock_sess.return_value = self._mock_session()
+    def test_webp_output_created(self, proc, gradient_image, tmp_path):
+        out = tmp_path / "result.webp"
+        ok = proc.remove_background(str(gradient_image), str(out), output_format="WEBP")
+        assert ok is True
+        assert out.exists()
+
+    def test_progress_callback(self, proc, gradient_image, tmp_path):
         calls: list[tuple[float, str]] = []
+        proc.remove_background(
+            str(gradient_image),
+            str(tmp_path / "out.png"),
+            progress_callback=lambda f, m: calls.append((f, m)),
+        )
+        assert len(calls) >= 3
+        assert calls[-1][0] == 1.0
 
-        with patch("rembg.remove", _make_mock_remove(self._transparent_result())):
-            proc.remove_background(
-                str(rgb_image),
-                str(tmp_path / "out.png"),
-                progress_callback=lambda f, m: calls.append((f, m)),
-            )
-
-        assert len(calls) > 0
-        fracs = [c[0] for c in calls]
-        assert fracs[-1] == 1.0  # always ends at 100 %
-
-    @patch("src.processor.BackgroundProcessor._get_session")
-    def test_raises_on_bad_input(self, mock_sess, proc, tmp_path):
-        mock_sess.return_value = self._mock_session()
+    def test_raises_on_missing_file(self, proc, tmp_path):
         with pytest.raises(RuntimeError):
             proc.remove_background(
-                str(tmp_path / "does_not_exist.png"),
+                str(tmp_path / "nope.png"),
                 str(tmp_path / "out.png"),
             )
 
+    def test_grabcut_detail_model(self, proc, gradient_image, tmp_path):
+        out = tmp_path / "hd.png"
+        ok = proc.remove_background(
+            str(gradient_image), str(out), model_name="grabcut_detail"
+        )
+        assert ok is True
 
-# ─────────────────────────────────────────────────────────────
-#  BackgroundProcessor — session caching
-# ─────────────────────────────────────────────────────────────
+    def test_edge_refined_model(self, proc, gradient_image, tmp_path):
+        out = tmp_path / "edge.png"
+        ok = proc.remove_background(
+            str(gradient_image), str(out), model_name="edge_refined"
+        )
+        assert ok is True
 
-
-class TestSessionCaching:
-    @patch("rembg.new_session")
-    def test_session_reused_for_same_model(self, mock_new_session, proc):
-        mock_new_session.return_value = MagicMock()
-
-        proc._get_session("u2net")
-        proc._get_session("u2net")
-
-        assert mock_new_session.call_count == 1
-
-    @patch("rembg.new_session")
-    def test_session_reloaded_for_different_model(self, mock_new_session, proc):
-        mock_new_session.return_value = MagicMock()
-
-        proc._get_session("u2net")
-        proc._get_session("isnet-general-use")
-
-        assert mock_new_session.call_count == 2
+    def test_color_range_model(self, proc, gradient_image, tmp_path):
+        out = tmp_path / "color.png"
+        ok = proc.remove_background(
+            str(gradient_image), str(out), model_name="color_range"
+        )
+        assert ok is True
 
 
-# ─────────────────────────────────────────────────────────────
-#  Utility helpers
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+#  get_preview
+# ─────────────────────────────────────────────────────────────────────────────
 
 
-class TestFormatSize:
-    """Smoke tests for the static _fmt_size helper (tested via direct import)."""
+class TestGetPreview:
+    def test_returns_rgba_image(self, proc, gradient_image):
+        result = proc.get_preview(str(gradient_image))
+        assert isinstance(result, Image.Image)
+        assert result.mode == "RGBA"
+
+    def test_raises_on_missing_file(self, proc, tmp_path):
+        with pytest.raises(RuntimeError):
+            proc.get_preview(str(tmp_path / "ghost.png"))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  _smooth_alpha
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestSmoothAlpha:
+    def test_output_same_shape(self):
+        alpha = np.zeros((50, 50), dtype=np.uint8)
+        alpha[15:35, 15:35] = 255
+        out = _smooth_alpha(alpha)
+        assert out.shape == alpha.shape
+
+    def test_output_dtype_uint8(self):
+        alpha = (np.random.rand(30, 30) * 255).astype(np.uint8)
+        assert _smooth_alpha(alpha).dtype == np.uint8
+
+    def test_edges_are_blurred(self):
+        # Sharp step should become softer after smoothing
+        alpha = np.zeros((20, 20), dtype=np.uint8)
+        alpha[:, 10:] = 255
+        out = _smooth_alpha(alpha, radius=2)
+        # Pixels right at the edge should be between 0 and 255
+        mid_col = out[:, 9]
+        assert (mid_col > 0).any()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  _fmt_size UI helper
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestFmtSize:
+    """Import the helper directly from app — keep it isolated from the display."""
 
     def test_bytes(self):
         from src.ui.app import PixelPeelApp
-        assert "B"  in PixelPeelApp._fmt_size(512)
+        assert "B" in PixelPeelApp._fmt_size(512)
 
     def test_kilobytes(self):
         from src.ui.app import PixelPeelApp
@@ -247,4 +260,4 @@ class TestFormatSize:
 
     def test_megabytes(self):
         from src.ui.app import PixelPeelApp
-        assert "MB" in PixelPeelApp._fmt_size(2 * 1024 * 1024)
+        assert "MB" in PixelPeelApp._fmt_size(3 * 1024 * 1024)
