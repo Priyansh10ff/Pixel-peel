@@ -8,7 +8,7 @@ zero model downloads. Uses OpenCV GrabCut and related algorithms.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, Optional, Tuple
+from typing import Callable
 
 import cv2
 import numpy as np
@@ -41,10 +41,10 @@ class BackgroundProcessor:
         input_path: str,
         output_path: str,
         *,
-        model_name: Optional[str] = None,
-        bg_color: Optional[Tuple[int, int, int]] = None,
+        model_name: str | None = None,
+        bg_color: tuple[int, int, int] | None = None,
         output_format: str = "PNG",
-        progress_callback: Optional[Callable[[float, str], None]] = None,
+        progress_callback: Callable[[float, str], None] | None = None,
     ) -> bool:
         """
         Remove the background from *input_path* and write the result to
@@ -96,7 +96,7 @@ class BackgroundProcessor:
     def get_preview(
         self,
         input_path: str,
-        model_name: Optional[str] = None,
+        model_name: str | None = None,
     ) -> Image.Image:
         """Return the background-removed image without saving to disk."""
         bgr = cv2.imread(input_path)
@@ -295,7 +295,7 @@ class BackgroundProcessor:
     @staticmethod
     def _apply_bg(
         image: Image.Image,
-        bg_color: Optional[Tuple[int, int, int]],
+        bg_color: tuple[int, int, int] | None,
         fmt: str,
     ) -> Image.Image:
         """Apply a background colour if requested, or handle JPEG opacity."""

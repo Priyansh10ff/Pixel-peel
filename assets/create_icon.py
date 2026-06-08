@@ -13,8 +13,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
-
+from PIL import Image, ImageDraw
 
 # ── Brand colours ──────────────────────────────────────────────────────────────
 BG_DARK    = (13,  13,  15)    # #0D0D0F  — Midnight background

@@ -11,13 +11,6 @@ Usage:
 import sys
 
 
-def check_python_version():
-    if sys.version_info < (3, 9):
-        print("❌  Python 3.9+ is required.")
-        print(f"   You have: Python {sys.version.split()[0]}")
-        sys.exit(1)
-
-
 def check_dependencies():
     """Verify all required packages are installed (without importing them)."""
     import importlib.util
@@ -42,7 +35,6 @@ def check_dependencies():
 
 
 def main():
-    check_python_version()
     check_dependencies()
 
     from src.ui.app import PixelPeelApp

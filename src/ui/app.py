@@ -11,7 +11,6 @@ import threading
 import tkinter as tk
 from pathlib import Path
 from tkinter import colorchooser, filedialog
-from typing import Optional
 
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageTk
@@ -21,7 +20,7 @@ from src.ui.themes import COLORS, current, set_theme
 
 # Optional drag-and-drop support (install tkinterdnd2 for full DnD)
 try:
-    from tkinterdnd2 import DND_FILES, TkinterDnD  # type: ignore
+    from tkinterdnd2 import DND_FILES  # type: ignore  # noqa: F401
 
     _HAS_DND = True
 except ImportError:
@@ -62,9 +61,9 @@ class PixelPeelApp(ctk.CTk):
         super().__init__()
 
         # ── app state ──────────────────────────────────────────────────
-        self.current_image_path: Optional[str] = None
-        self.original_image: Optional[Image.Image] = None
-        self.processed_image: Optional[Image.Image] = None
+        self.current_image_path: str | None = None
+        self.original_image: Image.Image | None = None
+        self.processed_image: Image.Image | None = None
         self.is_processing: bool = False
         self.batch_files: list[str] = []
         self.processed_count: int = 0
@@ -1045,7 +1044,7 @@ class PixelPeelApp(ctk.CTk):
         self._status_lbl.configure(text=msg)
         self._status_dot.configure(text_color=dot_color)
 
-    def _resolve_bg(self, option: str) -> Optional[tuple[int, int, int]]:
+    def _resolve_bg(self, option: str) -> tuple[int, int, int] | None:
         """Convert bg option string to RGB tuple (or None for transparent)."""
         if option == "White":
             return (255, 255, 255)
@@ -1084,8 +1083,10 @@ class PixelPeelApp(ctk.CTk):
 
     @staticmethod
     def _fmt_size(n: int) -> str:
-        if n < 1024:           return f"{n} B"
-        if n < 1024 ** 2:      return f"{n // 1024} KB"
+        if n < 1024:
+            return f"{n} B"
+        if n < 1024 ** 2:
+            return f"{n // 1024} KB"
         return f"{n / 1024**2:.1f} MB"
 
     # ── Run ───────────────────────────────────────────────────────────
