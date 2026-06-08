@@ -1,0 +1,181 @@
+# ─────────────────────────────────────────────────────────────
+#  PixelPeel — Build & Release Workflow
+#
+#  Triggers on:  git tag  v*  (e.g. v1.0.0, v1.2.3-beta)
+#
+#  What it does:
+#    1. Builds a native binary on each platform in parallel
+#    2. Packages each into a distributable archive
+#    3. Creates a GitHub Release and uploads all three archives
+#
+#  Users only need to download ONE file — no Python required.
+# ─────────────────────────────────────────────────────────────
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write   # needed to create GitHub Releases
+
+# ─────────────────────────────────────────────────────────────
+jobs:
+
+  # ── Build on each platform ──────────────────────────────────
+  build:
+    name: Build — ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: PixelPeel-Windows.zip
+            archive_cmd: pwsh
+          - os: macos-latest
+            artifact_name: PixelPeel-macOS.zip
+            archive_cmd: zip
+          - os: ubuntu-latest
+            artifact_name: PixelPeel-Linux.tar.gz
+            archive_cmd: tar
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Python (includes tkinter on Windows & macOS) ────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # ── Linux: tkinter lives in a system package ─────────────
+      - name: Install system deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y python3-tk xvfb
+
+      # ── Python deps + PyInstaller ────────────────────────────
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      # ── Icon (Windows → .ico, others → .png) ─────────────────
+      - name: Generate icon (Windows)
+        if: runner.os == 'Windows'
+        run: python assets/create_icon.py assets/pixelpeel.ico
+
+      - name: Generate icon (macOS / Linux)
+        if: runner.os != 'Windows'
+        run: python assets/create_icon.py assets/pixelpeel.png
+
+      # ── Build ────────────────────────────────────────────────
+      - name: Build with PyInstaller (Linux — headless)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum pyinstaller pixelpeel.spec --noconfirm
+
+      - name: Build with PyInstaller (Windows / macOS)
+        if: runner.os != 'Linux'
+        run: pyinstaller pixelpeel.spec --noconfirm
+
+      # ── Smoke test: binary exists ────────────────────────────
+      - name: Verify binary exists (Windows)
+        if: runner.os == 'Windows'
+        run: Test-Path dist\PixelPeel\PixelPeel.exe
+        shell: pwsh
+
+      - name: Verify binary exists (macOS)
+        if: runner.os == 'macOS'
+        run: test -d dist/PixelPeel.app
+
+      - name: Verify binary exists (Linux)
+        if: runner.os == 'Linux'
+        run: test -f dist/PixelPeel/PixelPeel
+
+      # ── Package ──────────────────────────────────────────────
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: Compress-Archive -Path dist\PixelPeel -DestinationPath dist\PixelPeel-Windows.zip
+        shell: pwsh
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: cd dist && zip -r --quiet PixelPeel-macOS.zip PixelPeel.app
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: cd dist && tar -czf PixelPeel-Linux.tar.gz PixelPeel/
+
+      # ── Upload build artifact (passed to release job) ────────
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.artifact_name }}
+          retention-days: 1
+
+  # ── Create GitHub Release with all three archives ───────────
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build   # wait for all three builds to succeed
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Download all platform archives built above
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: PixelPeel-Windows.zip
+          path: release/
+
+      - name: Download macOS build
+        uses: actions/download-artifact@v4
+        with:
+          name: PixelPeel-macOS.zip
+          path: release/
+
+      - name: Download Linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: PixelPeel-Linux.tar.gz
+          path: release/
+
+      - name: List release assets
+        run: ls -lh release/
+
+      # ── Publish GitHub Release ───────────────────────────────
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "PixelPeel ${{ github.ref_name }}"
+          generate_release_notes: true
+          body: |
+            ## PixelPeel ${{ github.ref_name }}
+
+            ### ⬇️ Download
+
+            | Platform | File | Notes |
+            |---|---|---|
+            | 🪟 Windows 10/11 | `PixelPeel-Windows.zip` | Extract → double-click `PixelPeel.exe` |
+            | 🍎 macOS 12+ | `PixelPeel-macOS.zip` | Extract → move `PixelPeel.app` to Applications |
+            | 🐧 Linux (Ubuntu 22+) | `PixelPeel-Linux.tar.gz` | Extract → run `./PixelPeel/PixelPeel` |
+
+            > **No Python installation required** — just download and run.
+
+            ---
+            *Built automatically from tag `${{ github.ref_name }}` by GitHub Actions.*
+          files: |
+            release/PixelPeel-Windows.zip
+            release/PixelPeel-macOS.zip
+            release/PixelPeel-Linux.tar.gz
