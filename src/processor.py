@@ -5,6 +5,7 @@ Core engine for removing image backgrounds using classical computer vision.
 No AI, no neural networks, no ONNX models — runs entirely offline with
 zero model downloads. Uses OpenCV GrabCut and related algorithms.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -23,10 +24,10 @@ class BackgroundProcessor:
     """
 
     MODELS: dict[str, str] = {
-        "grabcut":        "GrabCut — Best balance of speed & quality",
+        "grabcut": "GrabCut — Best balance of speed & quality",
         "grabcut_detail": "GrabCut HD — Finer edges, more iterations",
-        "edge_refined":   "Edge Refine — Canny edge + morphology blend",
-        "color_range":    "Color Range — Best for solid/gradient backgrounds",
+        "edge_refined": "Edge Refine — Canny edge + morphology blend",
+        "color_range": "Color Range — Best for solid/gradient backgrounds",
     }
 
     def __init__(self, default_model: str = "grabcut") -> None:
@@ -64,6 +65,7 @@ class BackgroundProcessor:
         -------
         True on success, raises RuntimeError on failure.
         """
+
         def _cb(frac: float, msg: str) -> None:
             if progress_callback:
                 progress_callback(frac, msg)
@@ -157,8 +159,9 @@ class BackgroundProcessor:
         fgd_model = np.zeros((1, 65), np.float64)
 
         cb(0.25, "Running GrabCut…")
-        cv2.grabCut(bgr, mask, rect, bgd_model, fgd_model,
-                    iterations, cv2.GC_INIT_WITH_RECT)
+        cv2.grabCut(
+            bgr, mask, rect, bgd_model, fgd_model, iterations, cv2.GC_INIT_WITH_RECT
+        )
 
         # 0 = definite BG | 1 = definite FG | 2 = probable BG | 3 = probable FG
         alpha = np.where((mask == 2) | (mask == 0), 0, 255).astype(np.uint8)
@@ -185,8 +188,9 @@ class BackgroundProcessor:
         edges = cv2.Canny(blurred, 30, 120)
 
         cb(0.30, "Running GrabCut…")
-        alpha_gc = self._grabcut(bgr, iterations=7,
-                                 refine_edges=False, cb=lambda *_: None)
+        alpha_gc = self._grabcut(
+            bgr, iterations=7, refine_edges=False, cb=lambda *_: None
+        )
 
         cb(0.60, "Blending edge map…")
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
@@ -217,28 +221,32 @@ class BackgroundProcessor:
 
         margin = max(2, min(h, w) // 20)
         # Collect corner samples
-        samples = np.vstack([
-            bgr[:margin, :margin].reshape(-1, 3),
-            bgr[:margin, -margin:].reshape(-1, 3),
-            bgr[-margin:, :margin].reshape(-1, 3),
-            bgr[-margin:, -margin:].reshape(-1, 3),
-        ])
+        samples = np.vstack(
+            [
+                bgr[:margin, :margin].reshape(-1, 3),
+                bgr[:margin, -margin:].reshape(-1, 3),
+                bgr[-margin:, :margin].reshape(-1, 3),
+                bgr[-margin:, -margin:].reshape(-1, 3),
+            ]
+        )
         bg_bgr = np.median(samples, axis=0).astype(np.uint8)
 
         cb(0.35, "Building Lab distance map…")
         lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2Lab).astype(np.float32)
-        bg_lab = cv2.cvtColor(
-            bg_bgr.reshape(1, 1, 3), cv2.COLOR_BGR2Lab
-        ).astype(np.float32).reshape(3)
+        bg_lab = (
+            cv2.cvtColor(bg_bgr.reshape(1, 1, 3), cv2.COLOR_BGR2Lab)
+            .astype(np.float32)
+            .reshape(3)
+        )
 
         diff = lab - bg_lab
-        dist = np.sqrt((diff ** 2).sum(axis=2))
+        dist = np.sqrt((diff**2).sum(axis=2))
 
         cb(0.55, "Thresholding…")
         thresh = max(18.0, float(np.percentile(dist, 20)) * 2.8)
-        alpha = np.clip(
-            (dist - thresh * 0.4) / (thresh * 1.2) * 255, 0, 255
-        ).astype(np.uint8)
+        alpha = np.clip((dist - thresh * 0.4) / (thresh * 1.2) * 255, 0, 255).astype(
+            np.uint8
+        )
 
         cb(0.65, "Cleaning mask…")
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
@@ -281,8 +289,7 @@ class BackgroundProcessor:
             return alpha
 
         try:
-            cv2.grabCut(bgr, mask, None, bgd_model, fgd_model,
-                        3, cv2.GC_INIT_WITH_MASK)
+            cv2.grabCut(bgr, mask, None, bgd_model, fgd_model, 3, cv2.GC_INIT_WITH_MASK)
         except cv2.error:
             return alpha
 
@@ -334,6 +341,7 @@ class BackgroundProcessor:
 # ------------------------------------------------------------------
 # Module-level helper
 # ------------------------------------------------------------------
+
 
 def _smooth_alpha(alpha: np.ndarray, radius: int = 2) -> np.ndarray:
     """Apply a mild Gaussian blur to soften mask edges."""

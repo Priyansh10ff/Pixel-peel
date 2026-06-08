@@ -8,6 +8,7 @@ No external assets needed — called automatically by the installers.
 Usage:
     python assets/create_icon.py [output_path]
 """
+
 from __future__ import annotations
 
 import sys
@@ -16,10 +17,10 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 # ── Brand colours ──────────────────────────────────────────────────────────────
-BG_DARK    = (13,  13,  15)    # #0D0D0F  — Midnight background
-ACCENT     = (124, 111, 247)   # #7C6FF7  — Electric violet
-ACCENT2    = (78,  205, 196)   # #4ECDC4  — Mint teal
-WHITE      = (242, 242, 247)   # #F2F2F7
+BG_DARK = (13, 13, 15)  # #0D0D0F  — Midnight background
+ACCENT = (124, 111, 247)  # #7C6FF7  — Electric violet
+ACCENT2 = (78, 205, 196)  # #4ECDC4  — Mint teal
+WHITE = (242, 242, 247)  # #F2F2F7
 
 
 def _make_base(size: int) -> Image.Image:
@@ -27,9 +28,9 @@ def _make_base(size: int) -> Image.Image:
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    pad  = int(size * 0.06)
-    cx   = size // 2
-    cy   = size // 2
+    pad = int(size * 0.06)
+    cx = size // 2
+    cy = size // 2
 
     # ── Rounded-square background ─────────────────────────────────────────────
     r = int(size * 0.22)
@@ -42,19 +43,19 @@ def _make_base(size: int) -> Image.Image:
     # ── Diamond (◆) — violet fill, mint inner glow ───────────────────────────
     d = int(size * 0.35)
     diamond = [
-        (cx,      cy - d),   # top
-        (cx + d,  cy),       # right
-        (cx,      cy + d),   # bottom
-        (cx - d,  cy),       # left
+        (cx, cy - d),  # top
+        (cx + d, cy),  # right
+        (cx, cy + d),  # bottom
+        (cx - d, cy),  # left
     ]
     draw.polygon(diamond, fill=ACCENT)
 
     # Inner diamond (cut-out / highlight)
     di = int(d * 0.45)
     inner = [
-        (cx,      cy - di),
+        (cx, cy - di),
         (cx + di, cy),
-        (cx,      cy + di),
+        (cx, cy + di),
         (cx - di, cy),
     ]
     draw.polygon(inner, fill=ACCENT2)

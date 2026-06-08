@@ -5,6 +5,7 @@ Tests for BackgroundProcessor without a display or GPU.
 All OpenCV calls use real algorithms on synthetic images —
 no mocking needed because GrabCut works on tiny arrays.
 """
+
 from __future__ import annotations
 
 import sys
@@ -48,8 +49,8 @@ def rgba_image(tmp_path: Path) -> Path:
 @pytest.fixture()
 def gradient_image(tmp_path: Path) -> Path:
     """100×100 image: white border, red centre — ideal for GrabCut."""
-    arr = np.ones((100, 100, 3), dtype=np.uint8) * 240   # light grey BG
-    arr[20:80, 20:80] = [200, 50, 50]                    # red FG
+    arr = np.ones((100, 100, 3), dtype=np.uint8) * 240  # light grey BG
+    arr[20:80, 20:80] = [200, 50, 50]  # red FG
     p = tmp_path / "grad.png"
     cv2.imwrite(str(p), arr)
     return p
@@ -66,7 +67,10 @@ class TestModels:
 
     def test_expected_keys(self, proc):
         assert set(proc.MODELS) == {
-            "grabcut", "grabcut_detail", "edge_refined", "color_range"
+            "grabcut",
+            "grabcut_detail",
+            "edge_refined",
+            "color_range",
         }
 
     def test_descriptions_non_empty(self, proc):
@@ -147,8 +151,10 @@ class TestRemoveBackground:
     def test_jpeg_output_created(self, proc, gradient_image, tmp_path):
         out = tmp_path / "result.jpg"
         ok = proc.remove_background(
-            str(gradient_image), str(out),
-            output_format="JPEG", bg_color=(255, 255, 255),
+            str(gradient_image),
+            str(out),
+            output_format="JPEG",
+            bg_color=(255, 255, 255),
         )
         assert ok is True
         assert out.exists()
@@ -250,12 +256,15 @@ class TestFmtSize:
 
     def test_bytes(self):
         from src.ui.app import PixelPeelApp
+
         assert "B" in PixelPeelApp._fmt_size(512)
 
     def test_kilobytes(self):
         from src.ui.app import PixelPeelApp
+
         assert "KB" in PixelPeelApp._fmt_size(2048)
 
     def test_megabytes(self):
         from src.ui.app import PixelPeelApp
+
         assert "MB" in PixelPeelApp._fmt_size(3 * 1024 * 1024)

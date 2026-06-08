@@ -8,6 +8,7 @@ No AI, no neural networks, no cloud uploads.
 Usage:
     python main.py
 """
+
 import sys
 
 
@@ -16,10 +17,10 @@ def check_dependencies():
     import importlib.util
 
     required = {
-        "cv2":           "opencv-python>=4.8.0",
+        "cv2": "opencv-python>=4.8.0",
         "customtkinter": "customtkinter>=5.2.2",
-        "PIL":           "Pillow>=10.0.0",
-        "numpy":         "numpy>=1.26.0",
+        "PIL": "Pillow>=10.0.0",
+        "numpy": "numpy>=1.26.0",
     }
     missing = []
     for module, package in required.items():

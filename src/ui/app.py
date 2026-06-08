@@ -5,6 +5,7 @@ Single‑file UI built on CustomTkinter.
 Includes: sidebar, drag-and-drop zone, split before/after preview,
           batch processing queue, animated progress, dark / light themes.
 """
+
 from __future__ import annotations
 
 import threading
@@ -68,12 +69,12 @@ class PixelPeelApp(ctk.CTk):
         self.batch_files: list[str] = []
         self.processed_count: int = 0
         self.is_dark: bool = True
-        self._photo_refs: list = []          # keep PhotoImage refs alive
-        self._split_pos: float = 0.5         # 0‥1 divider position
+        self._photo_refs: list = []  # keep PhotoImage refs alive
+        self._split_pos: float = 0.5  # 0‥1 divider position
         self._dz_hovered: bool = False
 
         # ── settings vars ──────────────────────────────────────────────
-        self.model_var  = ctk.StringVar(value="grabcut")
+        self.model_var = ctk.StringVar(value="grabcut")
         self.format_var = ctk.StringVar(value="PNG")
         self.bg_opt_var = ctk.StringVar(value="Transparent")
         self.bg_hex: str = "#FFFFFF"
@@ -97,7 +98,7 @@ class PixelPeelApp(ctk.CTk):
 
         # centre on screen
         self.update_idletasks()
-        x = max(0, (self.winfo_screenwidth()  - self._WIN_W) // 2)
+        x = max(0, (self.winfo_screenwidth() - self._WIN_W) // 2)
         y = max(0, (self.winfo_screenheight() - self._WIN_H) // 2 - 30)
         self.geometry(f"{self._WIN_W}x{self._WIN_H}+{x}+{y}")
 
@@ -142,20 +143,26 @@ class PixelPeelApp(ctk.CTk):
         lf.grid_columnconfigure(0, weight=1)
 
         ctk.CTkLabel(
-            lf, text="◆  PixelPeel",
+            lf,
+            text="◆  PixelPeel",
             font=ctk.CTkFont(family="Helvetica", size=21, weight="bold"),
             text_color=COLORS["accent"],
         ).grid(row=0, column=0, sticky="w")
 
         ctk.CTkLabel(
-            lf, text="AI Background Remover",
+            lf,
+            text="AI Background Remover",
             font=ctk.CTkFont(size=11),
             text_color=COLORS["subtext"],
         ).grid(row=1, column=0, sticky="w")
 
         self._theme_btn = ctk.CTkButton(
-            lf, text="☀", width=34, height=34,
-            fg_color=COLORS["card"], hover_color=COLORS["border"],
+            lf,
+            text="☀",
+            width=34,
+            height=34,
+            fg_color=COLORS["card"],
+            hover_color=COLORS["border"],
             text_color=COLORS["text"],
             font=ctk.CTkFont(size=15),
             corner_radius=8,
@@ -172,10 +179,10 @@ class PixelPeelApp(ctk.CTk):
         models_f.grid(row=3, column=0, sticky="ew", padx=18, pady=(0, 4))
 
         _model_defs = [
-            ("grabcut",        "GrabCut",      "Best balance of speed & quality"),
-            ("grabcut_detail", "GrabCut HD",   "Finer edges  •  more iterations"),
-            ("edge_refined",   "Edge Refine",  "Canny edges + morphology blend"),
-            ("color_range",    "Color Range",  "Best for solid/gradient backgrounds"),
+            ("grabcut", "GrabCut", "Best balance of speed & quality"),
+            ("grabcut_detail", "GrabCut HD", "Finer edges  •  more iterations"),
+            ("edge_refined", "Edge Refine", "Canny edges + morphology blend"),
+            ("color_range", "Color Range", "Best for solid/gradient backgrounds"),
         ]
         for i, (key, label, desc) in enumerate(_model_defs):
             card = ctk.CTkFrame(models_f, fg_color=COLORS["card"], corner_radius=8)
@@ -183,22 +190,30 @@ class PixelPeelApp(ctk.CTk):
             card.grid_columnconfigure(1, weight=1)
 
             ctk.CTkRadioButton(
-                card, text="", variable=self.model_var, value=key,
+                card,
+                text="",
+                variable=self.model_var,
+                value=key,
                 width=22,
-                fg_color=COLORS["accent"], hover_color=COLORS["accent_hover"],
+                fg_color=COLORS["accent"],
+                hover_color=COLORS["accent_hover"],
                 command=self._on_model_change,
             ).grid(row=0, column=0, rowspan=2, padx=(10, 2), pady=8)
 
             ctk.CTkLabel(
-                card, text=label,
+                card,
+                text=label,
                 font=ctk.CTkFont(size=13, weight="bold"),
-                text_color=COLORS["text"], anchor="w",
+                text_color=COLORS["text"],
+                anchor="w",
             ).grid(row=0, column=1, sticky="w", padx=(0, 8), pady=(8, 1))
 
             ctk.CTkLabel(
-                card, text=desc,
+                card,
+                text=desc,
                 font=ctk.CTkFont(size=10),
-                text_color=COLORS["subtext"], anchor="w",
+                text_color=COLORS["subtext"],
+                anchor="w",
             ).grid(row=1, column=1, sticky="w", padx=(0, 8), pady=(0, 6))
 
         self._divider(sb, row=4)
@@ -229,8 +244,10 @@ class PixelPeelApp(ctk.CTk):
         bg_f.grid_columnconfigure(1, weight=1)
 
         ctk.CTkLabel(
-            bg_f, text="Background",
-            font=ctk.CTkFont(size=12), text_color=COLORS["subtext"],
+            bg_f,
+            text="Background",
+            font=ctk.CTkFont(size=12),
+            text_color=COLORS["subtext"],
         ).grid(row=0, column=0, sticky="w", padx=(0, 8))
 
         ctk.CTkSegmentedButton(
@@ -258,18 +275,25 @@ class PixelPeelApp(ctk.CTk):
 
         self._folder_entry = ctk.CTkEntry(
             ff,
-            fg_color=COLORS["card"], border_color=COLORS["border"],
+            fg_color=COLORS["card"],
+            border_color=COLORS["border"],
             text_color=COLORS["text"],
-            font=ctk.CTkFont(size=11), corner_radius=8,
+            font=ctk.CTkFont(size=11),
+            corner_radius=8,
         )
         self._folder_entry.insert(0, self.output_folder)
         self._folder_entry.grid(row=0, column=0, sticky="ew", padx=(0, 6))
 
         ctk.CTkButton(
-            ff, text="📁", width=36, height=36,
-            fg_color=COLORS["card"], hover_color=COLORS["border"],
+            ff,
+            text="📁",
+            width=36,
+            height=36,
+            fg_color=COLORS["card"],
+            hover_color=COLORS["border"],
             text_color=COLORS["text"],
-            font=ctk.CTkFont(size=17), corner_radius=8,
+            font=ctk.CTkFont(size=17),
+            corner_radius=8,
             command=self._browse_output_folder,
         ).grid(row=0, column=1)
 
@@ -281,7 +305,8 @@ class PixelPeelApp(ctk.CTk):
             sb,
             text="▶   Remove Background",
             height=48,
-            fg_color=COLORS["accent"], hover_color=COLORS["accent_hover"],
+            fg_color=COLORS["accent"],
+            hover_color=COLORS["accent_hover"],
             text_color="#FFFFFF",
             font=ctk.CTkFont(size=14, weight="bold"),
             corner_radius=12,
@@ -293,9 +318,11 @@ class PixelPeelApp(ctk.CTk):
             sb,
             text="💾   Save Result",
             height=40,
-            fg_color=COLORS["card"], hover_color=COLORS["border"],
+            fg_color=COLORS["card"],
+            hover_color=COLORS["border"],
             text_color=COLORS["text"],
-            font=ctk.CTkFont(size=13), corner_radius=10,
+            font=ctk.CTkFont(size=13),
+            corner_radius=10,
             command=self._save_result,
             state="disabled",
         )
@@ -310,9 +337,11 @@ class PixelPeelApp(ctk.CTk):
 
     def _section_label(self, parent: ctk.CTkFrame, row: int, text: str) -> None:
         ctk.CTkLabel(
-            parent, text=text,
+            parent,
+            text=text,
             font=ctk.CTkFont(size=10, weight="bold"),
-            text_color=COLORS["subtext"], anchor="w",
+            text_color=COLORS["subtext"],
+            anchor="w",
         ).grid(row=row, column=0, sticky="ew", padx=18, pady=(4, 2))
 
     # ══════════════════════════════════════════════════════════════════
@@ -353,9 +382,7 @@ class PixelPeelApp(ctk.CTk):
         tab.grid_rowconfigure(0, weight=1)
 
         # Drop zone / Preview container
-        self._dz_outer = ctk.CTkFrame(
-            tab, fg_color=COLORS["card"], corner_radius=16
-        )
+        self._dz_outer = ctk.CTkFrame(tab, fg_color=COLORS["card"], corner_radius=16)
         self._dz_outer.grid(row=0, column=0, sticky="nsew", padx=6, pady=(6, 6))
         self._dz_outer.grid_columnconfigure(0, weight=1)
         self._dz_outer.grid_rowconfigure(0, weight=1)
@@ -366,16 +393,21 @@ class PixelPeelApp(ctk.CTk):
         prog_f.grid_columnconfigure(0, weight=1)
 
         self._prog_bar = ctk.CTkProgressBar(
-            prog_f, height=6,
-            fg_color=COLORS["border"], progress_color=COLORS["accent"],
+            prog_f,
+            height=6,
+            fg_color=COLORS["border"],
+            progress_color=COLORS["accent"],
             corner_radius=3,
         )
         self._prog_bar.grid(row=0, column=0, sticky="ew")
         self._prog_bar.set(0)
 
         self._prog_lbl = ctk.CTkLabel(
-            prog_f, text="",
-            font=ctk.CTkFont(size=11), text_color=COLORS["subtext"], anchor="e",
+            prog_f,
+            text="",
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
+            anchor="e",
         )
         self._prog_lbl.grid(row=0, column=1, padx=(8, 0))
 
@@ -395,9 +427,9 @@ class PixelPeelApp(ctk.CTk):
         self._dz_canvas.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
         self._dz_canvas.bind("<Configure>", lambda _e: self._draw_dropzone())
-        self._dz_canvas.bind("<Button-1>",  lambda _e: self._browse_image())
-        self._dz_canvas.bind("<Enter>",     self._dz_enter)
-        self._dz_canvas.bind("<Leave>",     self._dz_leave)
+        self._dz_canvas.bind("<Button-1>", lambda _e: self._browse_image())
+        self._dz_canvas.bind("<Enter>", self._dz_enter)
+        self._dz_canvas.bind("<Leave>", self._dz_leave)
 
         if _HAS_DND:
             self._dz_canvas.drop_target_register(DND_FILES)
@@ -411,11 +443,11 @@ class PixelPeelApp(ctk.CTk):
             self.after(50, self._draw_dropzone)
             return
 
-        bg   = current("card")
+        bg = current("card")
         bord = current("accent") if self._dz_hovered else current("border")
-        txt  = current("text")
-        sub  = current("subtext")
-        acc  = current("accent")
+        txt = current("text")
+        sub = current("subtext")
+        acc = current("accent")
 
         c.configure(bg=bg)
 
@@ -428,39 +460,67 @@ class PixelPeelApp(ctk.CTk):
         icon_y = cy - 70
 
         # arrow shaft
-        c.create_line(cx, icon_y + 50, cx, icon_y + 12, fill=acc, width=3, capstyle="round")
+        c.create_line(
+            cx, icon_y + 50, cx, icon_y + 12, fill=acc, width=3, capstyle="round"
+        )
         # arrowhead
         c.create_polygon(
-            cx, icon_y,
-            cx - 16, icon_y + 22,
-            cx + 16, icon_y + 22,
-            fill=acc, outline="",
+            cx,
+            icon_y,
+            cx - 16,
+            icon_y + 22,
+            cx + 16,
+            icon_y + 22,
+            fill=acc,
+            outline="",
         )
         # base line
-        c.create_line(cx - 22, icon_y + 55, cx + 22, icon_y + 55, fill=acc, width=3, capstyle="round")
+        c.create_line(
+            cx - 22,
+            icon_y + 55,
+            cx + 22,
+            icon_y + 55,
+            fill=acc,
+            width=3,
+            capstyle="round",
+        )
 
         head = "Drop your image here" if _HAS_DND else "Click to browse images"
-        c.create_text(cx, cy + 8,  text=head, font=("Helvetica", 17, "bold"), fill=txt)
-        c.create_text(cx, cy + 36, text="or click to browse",    font=("Helvetica", 12), fill=sub)
-        c.create_text(cx, cy + 58, text="PNG  ·  JPG  ·  WEBP  ·  BMP  ·  TIFF",
-                      font=("Helvetica", 11), fill=sub)
+        c.create_text(cx, cy + 8, text=head, font=("Helvetica", 17, "bold"), fill=txt)
+        c.create_text(
+            cx, cy + 36, text="or click to browse", font=("Helvetica", 12), fill=sub
+        )
+        c.create_text(
+            cx,
+            cy + 58,
+            text="PNG  ·  JPG  ·  WEBP  ·  BMP  ·  TIFF",
+            font=("Helvetica", 11),
+            fill=sub,
+        )
 
     @staticmethod
     def _rounded_dash(
-        canvas: tk.Canvas, x1: int, y1: int, x2: int, y2: int,
-        r: int, color: str, dash: tuple, width: int = 2,
+        canvas: tk.Canvas,
+        x1: int,
+        y1: int,
+        x2: int,
+        y2: int,
+        r: int,
+        color: str,
+        dash: tuple,
+        width: int = 2,
     ) -> None:
         """Draw a rounded-corner dashed rectangle on *canvas*."""
         kw = dict(fill=color, width=width, dash=dash)
-        canvas.create_line(x1 + r, y1,      x2 - r, y1,      **kw)
-        canvas.create_line(x2,     y1 + r,  x2,     y2 - r,  **kw)
-        canvas.create_line(x2 - r, y2,      x1 + r, y2,      **kw)
-        canvas.create_line(x1,     y2 - r,  x1,     y1 + r,  **kw)
+        canvas.create_line(x1 + r, y1, x2 - r, y1, **kw)
+        canvas.create_line(x2, y1 + r, x2, y2 - r, **kw)
+        canvas.create_line(x2 - r, y2, x1 + r, y2, **kw)
+        canvas.create_line(x1, y2 - r, x1, y1 + r, **kw)
         arc_kw = dict(style="arc", outline=color, width=width)
-        canvas.create_arc(x1,      y1,      x1+r*2, y1+r*2, start= 90, extent=90, **arc_kw)
-        canvas.create_arc(x2-r*2,  y1,      x2,     y1+r*2, start=  0, extent=90, **arc_kw)
-        canvas.create_arc(x2-r*2,  y2-r*2,  x2,     y2,     start=270, extent=90, **arc_kw)
-        canvas.create_arc(x1,      y2-r*2,  x1+r*2, y2,     start=180, extent=90, **arc_kw)
+        canvas.create_arc(x1, y1, x1 + r * 2, y1 + r * 2, start=90, extent=90, **arc_kw)
+        canvas.create_arc(x2 - r * 2, y1, x2, y1 + r * 2, start=0, extent=90, **arc_kw)
+        canvas.create_arc(x2 - r * 2, y2 - r * 2, x2, y2, start=270, extent=90, **arc_kw)
+        canvas.create_arc(x1, y2 - r * 2, x1 + r * 2, y2, start=180, extent=90, **arc_kw)
 
     def _dz_enter(self, _e=None) -> None:
         self._dz_hovered = True
@@ -485,33 +545,47 @@ class PixelPeelApp(ctk.CTk):
             cursor="sb_h_double_arrow",
         )
         self._prev_canvas.grid(row=0, column=0, sticky="nsew")
-        self._prev_canvas.bind("<Configure>",    lambda _e: self._redraw_preview())
+        self._prev_canvas.bind("<Configure>", lambda _e: self._redraw_preview())
         self._prev_canvas.bind("<ButtonPress-1>", self._on_split_drag)
-        self._prev_canvas.bind("<B1-Motion>",     self._on_split_drag)
+        self._prev_canvas.bind("<B1-Motion>", self._on_split_drag)
 
         # Bottom toolbar
-        bar = ctk.CTkFrame(self._dz_outer, fg_color=COLORS["card"], height=44, corner_radius=0)
+        bar = ctk.CTkFrame(
+            self._dz_outer, fg_color=COLORS["card"], height=44, corner_radius=0
+        )
         bar.grid(row=1, column=0, sticky="ew")
         self._dz_outer.grid_rowconfigure(0, weight=1)
         self._dz_outer.grid_rowconfigure(1, weight=0)
 
         ctk.CTkButton(
-            bar, text="📂  Load New Image", height=30,
-            fg_color=COLORS["card"], hover_color=COLORS["border"],
-            text_color=COLORS["text"], font=ctk.CTkFont(size=12),
-            corner_radius=8, command=self._browse_image,
+            bar,
+            text="📂  Load New Image",
+            height=30,
+            fg_color=COLORS["card"],
+            hover_color=COLORS["border"],
+            text_color=COLORS["text"],
+            font=ctk.CTkFont(size=12),
+            corner_radius=8,
+            command=self._browse_image,
         ).pack(side="left", padx=10, pady=7)
 
         ctk.CTkLabel(
-            bar, text="← Drag slider to compare →",
-            font=ctk.CTkFont(size=11), text_color=COLORS["subtext"],
+            bar,
+            text="← Drag slider to compare →",
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
         ).pack(side="left", padx=6)
 
         ctk.CTkButton(
-            bar, text="🗑  Clear", height=30,
-            fg_color=COLORS["card"], hover_color=COLORS["border"],
-            text_color=COLORS["text"], font=ctk.CTkFont(size=12),
-            corner_radius=8, command=self._clear_image,
+            bar,
+            text="🗑  Clear",
+            height=30,
+            fg_color=COLORS["card"],
+            hover_color=COLORS["border"],
+            text_color=COLORS["text"],
+            font=ctk.CTkFont(size=12),
+            corner_radius=8,
+            command=self._clear_image,
         ).pack(side="right", padx=10, pady=7)
 
         self.after(30, self._redraw_preview)
@@ -541,7 +615,7 @@ class PixelPeelApp(ctk.CTk):
         orig_f = self._fit(orig, W, H)
         proc_f = self._fit(proc, W, H)
 
-        ox = (W - orig_f.width)  // 2
+        ox = (W - orig_f.width) // 2
         oy = (H - orig_f.height) // 2
 
         # Original (full canvas)
@@ -549,7 +623,7 @@ class PixelPeelApp(ctk.CTk):
         base.paste(orig_f, (ox, oy), orig_f)
 
         # Processed with checkerboard background
-        checker   = self._checkerboard(proc_f.width, proc_f.height)
+        checker = self._checkerboard(proc_f.width, proc_f.height)
         proc_comp = Image.new("RGBA", proc_f.size)
         proc_comp.paste(checker)
         proc_comp.paste(proc_f, mask=proc_f.split()[3])
@@ -568,8 +642,12 @@ class PixelPeelApp(ctk.CTk):
         draw = ImageDraw.Draw(final)
         draw.line([(sx, 0), (sx, H)], fill=(255, 255, 255, 210), width=2)
         hy, hr = H // 2, 20
-        draw.ellipse([(sx-hr, hy-hr), (sx+hr, hy+hr)],
-                     fill=(255, 255, 255, 240), outline=(180, 180, 180, 200), width=1)
+        draw.ellipse(
+            [(sx - hr, hy - hr), (sx + hr, hy + hr)],
+            fill=(255, 255, 255, 240),
+            outline=(180, 180, 180, 200),
+            width=1,
+        )
         # ⟺ arrows inside handle
         draw.text((sx - 9, hy - 9), "⟺", fill=(80, 80, 80, 255))
 
@@ -595,38 +673,50 @@ class PixelPeelApp(ctk.CTk):
         ctrl.grid(row=0, column=0, sticky="ew", padx=6, pady=(6, 4))
 
         for label, cmd, primary in [
-            ("＋  Add Images",  self._batch_add_files,  True),
-            ("📁  Add Folder",  self._batch_add_folder, False),
-            ("✕  Clear All",   self._batch_clear,       False),
+            ("＋  Add Images", self._batch_add_files, True),
+            ("📁  Add Folder", self._batch_add_folder, False),
+            ("✕  Clear All", self._batch_clear, False),
         ]:
             ctk.CTkButton(
-                ctrl, text=label, height=36,
+                ctrl,
+                text=label,
+                height=36,
                 fg_color=COLORS["accent"] if primary else COLORS["card"],
                 hover_color=COLORS["accent_hover"] if primary else COLORS["border"],
                 text_color="#FFFFFF" if primary else COLORS["text"],
                 font=ctk.CTkFont(size=13, weight="bold" if primary else "normal"),
-                corner_radius=8, command=cmd,
+                corner_radius=8,
+                command=cmd,
             ).pack(side="left", padx=(0, 6))
 
         self._batch_count_lbl = ctk.CTkLabel(
-            ctrl, text="0 files",
-            font=ctk.CTkFont(size=13), text_color=COLORS["subtext"],
+            ctrl,
+            text="0 files",
+            font=ctk.CTkFont(size=13),
+            text_color=COLORS["subtext"],
         )
         self._batch_count_lbl.pack(side="right", padx=(0, 8))
 
         self._batch_run_btn = ctk.CTkButton(
-            ctrl, text="▶  Process All", height=36,
-            fg_color=COLORS["accent"], hover_color=COLORS["accent_hover"],
+            ctrl,
+            text="▶  Process All",
+            height=36,
+            fg_color=COLORS["accent"],
+            hover_color=COLORS["accent_hover"],
             text_color="#FFFFFF",
             font=ctk.CTkFont(size=13, weight="bold"),
-            corner_radius=8, command=self._batch_process_all,
+            corner_radius=8,
+            command=self._batch_process_all,
             state="disabled",
         )
         self._batch_run_btn.pack(side="right")
 
         # Scrollable file list
         self._batch_list = ctk.CTkScrollableFrame(
-            tab, fg_color=COLORS["card"], corner_radius=12, label_text="",
+            tab,
+            fg_color=COLORS["card"],
+            corner_radius=12,
+            label_text="",
         )
         self._batch_list.grid(row=1, column=0, sticky="nsew", padx=6, pady=(0, 4))
         self._batch_list.grid_columnconfigure(0, weight=1)
@@ -635,7 +725,8 @@ class PixelPeelApp(ctk.CTk):
         self._batch_empty = ctk.CTkLabel(
             self._batch_list,
             text="📂\n\nNo files added yet\nClick  ＋ Add Images  to get started",
-            font=ctk.CTkFont(size=14), text_color=COLORS["subtext"],
+            font=ctk.CTkFont(size=14),
+            text_color=COLORS["subtext"],
         )
         self._batch_empty.pack(expand=True, pady=60)
 
@@ -645,16 +736,21 @@ class PixelPeelApp(ctk.CTk):
         bp.grid_columnconfigure(0, weight=1)
 
         self._batch_prog = ctk.CTkProgressBar(
-            bp, height=6,
-            fg_color=COLORS["border"], progress_color=COLORS["accent2"],
+            bp,
+            height=6,
+            fg_color=COLORS["border"],
+            progress_color=COLORS["accent2"],
             corner_radius=3,
         )
         self._batch_prog.grid(row=0, column=0, sticky="ew")
         self._batch_prog.set(0)
 
         self._batch_prog_lbl = ctk.CTkLabel(
-            bp, text="", font=ctk.CTkFont(size=11),
-            text_color=COLORS["subtext"], anchor="e",
+            bp,
+            text="",
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
+            anchor="e",
         )
         self._batch_prog_lbl.grid(row=0, column=1, padx=(8, 0))
 
@@ -666,14 +762,19 @@ class PixelPeelApp(ctk.CTk):
         sb.grid_propagate(False)
 
         self._status_dot = ctk.CTkLabel(
-            sb, text="●", font=ctk.CTkFont(size=10),
-            text_color=COLORS["success"], width=16,
+            sb,
+            text="●",
+            font=ctk.CTkFont(size=10),
+            text_color=COLORS["success"],
+            width=16,
         )
         self._status_dot.pack(side="left", padx=(12, 2), pady=6)
 
         self._status_lbl = ctk.CTkLabel(
-            sb, text="Ready",
-            font=ctk.CTkFont(size=12), text_color=COLORS["text"],
+            sb,
+            text="Ready",
+            font=ctk.CTkFont(size=12),
+            text_color=COLORS["text"],
         )
         self._status_lbl.pack(side="left", padx=(0, 14))
 
@@ -682,8 +783,10 @@ class PixelPeelApp(ctk.CTk):
         )
 
         self._model_lbl = ctk.CTkLabel(
-            sb, text="Mode: grabcut",
-            font=ctk.CTkFont(size=11), text_color=COLORS["subtext"],
+            sb,
+            text="Mode: grabcut",
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
         )
         self._model_lbl.pack(side="left", padx=12)
 
@@ -692,15 +795,18 @@ class PixelPeelApp(ctk.CTk):
         )
 
         self._count_lbl = ctk.CTkLabel(
-            sb, text="0 processed",
-            font=ctk.CTkFont(size=11), text_color=COLORS["subtext"],
+            sb,
+            text="0 processed",
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
         )
         self._count_lbl.pack(side="left", padx=12)
 
         ctk.CTkLabel(
             sb,
             text=f"PixelPeel v{self.VERSION}   ●   100% Local",
-            font=ctk.CTkFont(size=11), text_color=COLORS["subtext"],
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
         ).pack(side="right", padx=16)
 
     # ══════════════════════════════════════════════════════════════════
@@ -735,10 +841,10 @@ class PixelPeelApp(ctk.CTk):
 
     def _on_model_change(self) -> None:
         labels = {
-            "grabcut":        "grabcut",
+            "grabcut": "grabcut",
             "grabcut_detail": "grabcut-hd",
-            "edge_refined":   "edge-refine",
-            "color_range":    "color-range",
+            "edge_refined": "edge-refine",
+            "color_range": "color-range",
         }
         self._model_lbl.configure(text=f"Mode: {labels.get(self.model_var.get())}")
 
@@ -748,7 +854,9 @@ class PixelPeelApp(ctk.CTk):
 
     def _on_bg_change(self, value: str) -> None:
         if value == "Custom":
-            colour = colorchooser.askcolor(title="Pick Background Colour", color=self.bg_hex)
+            colour = colorchooser.askcolor(
+                title="Pick Background Colour", color=self.bg_hex
+            )
             if colour[1]:
                 self.bg_hex = colour[1]
 
@@ -768,7 +876,7 @@ class PixelPeelApp(ctk.CTk):
             title="Select Image",
             filetypes=[
                 ("Image Files", "*.png *.jpg *.jpeg *.webp *.bmp *.tiff *.tif"),
-                ("All Files",   "*.*"),
+                ("All Files", "*.*"),
             ],
         )
         if path:
@@ -783,9 +891,9 @@ class PixelPeelApp(ctk.CTk):
         try:
             img = Image.open(path).convert("RGBA")
             self.current_image_path = path
-            self.original_image     = img
-            self.processed_image    = None
-            self._split_pos         = 0.5
+            self.original_image = img
+            self.processed_image = None
+            self._split_pos = 0.5
             self._show_preview()
             self._set_status(f"Loaded: {Path(path).name}", "ready")
             self._save_btn.configure(state="disabled")
@@ -796,8 +904,8 @@ class PixelPeelApp(ctk.CTk):
 
     def _clear_image(self) -> None:
         self.current_image_path = None
-        self.original_image     = None
-        self.processed_image    = None
+        self.original_image = None
+        self.processed_image = None
         self._prog_bar.set(0)
         self._prog_lbl.configure(text="")
         self._save_btn.configure(state="disabled")
@@ -834,16 +942,19 @@ class PixelPeelApp(ctk.CTk):
             )
             bg_color = self._resolve_bg(bg_opt)
 
-            in_p  = Path(self.current_image_path)
+            in_p = Path(self.current_image_path)
             out_d = Path(self._folder_entry.get() or self.output_folder)
             out_d.mkdir(parents=True, exist_ok=True)
-            ext   = {"PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp"}.get(fmt, ".png")
+            ext = {"PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp"}.get(fmt, ".png")
             out_p = out_d / f"{in_p.stem}_nobg{ext}"
 
             self.processor.remove_background(
-                str(in_p), str(out_p),
-                model_name=model, bg_color=bg_color,
-                output_format=fmt, progress_callback=cb,
+                str(in_p),
+                str(out_p),
+                model_name=model,
+                bg_color=bg_color,
+                output_format=fmt,
+                progress_callback=cb,
             )
 
             result = Image.open(str(out_p)).convert("RGBA")
@@ -859,7 +970,7 @@ class PixelPeelApp(ctk.CTk):
 
     def _on_done(self, result: Image.Image, out_path: str) -> None:
         self.processed_image = result
-        self.is_processing   = False
+        self.is_processing = False
         self.processed_count += 1
         self._process_btn.configure(text="▶   Remove Background", state="normal")
         self._save_btn.configure(state="normal")
@@ -906,7 +1017,7 @@ class PixelPeelApp(ctk.CTk):
             title="Select Images",
             filetypes=[
                 ("Image Files", "*.png *.jpg *.jpeg *.webp *.bmp *.tiff *.tif"),
-                ("All Files",   "*.*"),
+                ("All Files", "*.*"),
             ],
         )
         for p in paths:
@@ -936,23 +1047,39 @@ class PixelPeelApp(ctk.CTk):
                 pass
 
         row = len(self._batch_items)
-        item = ctk.CTkFrame(self._batch_list, fg_color=COLORS["card"], corner_radius=8, height=46)
+        item = ctk.CTkFrame(
+            self._batch_list, fg_color=COLORS["card"], corner_radius=8, height=46
+        )
         item.grid(row=row, column=0, sticky="ew", pady=2, padx=4)
         item.grid_columnconfigure(1, weight=1)
         item.grid_propagate(False)
 
-        status_lbl = ctk.CTkLabel(item, text="○", font=ctk.CTkFont(size=14),
-                                  text_color=COLORS["subtext"], width=28)
+        status_lbl = ctk.CTkLabel(
+            item,
+            text="○",
+            font=ctk.CTkFont(size=14),
+            text_color=COLORS["subtext"],
+            width=28,
+        )
         status_lbl.grid(row=0, column=0, padx=(10, 4), pady=14)
 
-        ctk.CTkLabel(item, text=Path(path).name,
-                     font=ctk.CTkFont(size=12), text_color=COLORS["text"],
-                     anchor="w").grid(row=0, column=1, sticky="ew")
+        ctk.CTkLabel(
+            item,
+            text=Path(path).name,
+            font=ctk.CTkFont(size=12),
+            text_color=COLORS["text"],
+            anchor="w",
+        ).grid(row=0, column=1, sticky="ew")
 
         size = Path(path).stat().st_size if Path(path).exists() else 0
-        ctk.CTkLabel(item, text=self._fmt_size(size),
-                     font=ctk.CTkFont(size=11), text_color=COLORS["subtext"],
-                     width=64, anchor="e").grid(row=0, column=2, padx=(0, 10))
+        ctk.CTkLabel(
+            item,
+            text=self._fmt_size(size),
+            font=ctk.CTkFont(size=11),
+            text_color=COLORS["subtext"],
+            width=64,
+            anchor="e",
+        ).grid(row=0, column=2, padx=(0, 10))
 
         item._status = status_lbl  # type: ignore[attr-defined]
         self._batch_items.append(item)
@@ -965,7 +1092,8 @@ class PixelPeelApp(ctk.CTk):
         self._batch_empty = ctk.CTkLabel(
             self._batch_list,
             text="📂\n\nNo files added yet\nClick  ＋ Add Images  to get started",
-            font=ctk.CTkFont(size=14), text_color=COLORS["subtext"],
+            font=ctk.CTkFont(size=14),
+            text_color=COLORS["subtext"],
         )
         self._batch_empty.pack(expand=True, pady=60)
         self._update_batch_count()
@@ -984,15 +1112,15 @@ class PixelPeelApp(ctk.CTk):
         threading.Thread(target=self._batch_worker, daemon=True).start()
 
     def _batch_worker(self) -> None:
-        total    = len(self.batch_files)
-        out_dir  = Path(self._folder_entry.get() or self.output_folder)
+        total = len(self.batch_files)
+        out_dir = Path(self._folder_entry.get() or self.output_folder)
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        model   = self.model_var.get()
-        fmt     = self.format_var.get()
-        bg_opt  = self.bg_opt_var.get()
+        model = self.model_var.get()
+        fmt = self.format_var.get()
+        bg_opt = self.bg_opt_var.get()
         bg_color = self._resolve_bg(bg_opt)
-        ext     = {"PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp"}.get(fmt, ".png")
+        ext = {"PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp"}.get(fmt, ".png")
 
         for idx, path in enumerate(self.batch_files):
             self.after(0, lambda i=idx, n=total: self._batch_tick(i, n, "proc"))
@@ -1000,8 +1128,11 @@ class PixelPeelApp(ctk.CTk):
                 inp = Path(path)
                 outp = out_dir / f"{inp.stem}_nobg{ext}"
                 self.processor.remove_background(
-                    str(inp), str(outp),
-                    model_name=model, bg_color=bg_color, output_format=fmt,
+                    str(inp),
+                    str(outp),
+                    model_name=model,
+                    bg_color=bg_color,
+                    output_format=fmt,
                 )
                 self.processed_count += 1
                 self.after(0, lambda i=idx, n=total: self._batch_tick(i, n, "done"))
@@ -1016,19 +1147,27 @@ class PixelPeelApp(ctk.CTk):
         self._batch_prog_lbl.configure(text=f"{idx + 1}/{total}")
         self._count_lbl.configure(text=f"{self.processed_count} processed")
 
-        icons  = {"proc": "⏳", "done": "✓", "err": "✗"}
-        colors = {"proc": COLORS["warning"], "done": COLORS["success"], "err": COLORS["error"]}
+        icons = {"proc": "⏳", "done": "✓", "err": "✗"}
+        colors = {
+            "proc": COLORS["warning"],
+            "done": COLORS["success"],
+            "err": COLORS["error"],
+        }
         if idx < len(self._batch_items):
             lbl = self._batch_items[idx]._status  # type: ignore[attr-defined]
-            lbl.configure(text=icons.get(status, "○"),
-                          text_color=colors.get(status, COLORS["subtext"]))
+            lbl.configure(
+                text=icons.get(status, "○"),
+                text_color=colors.get(status, COLORS["subtext"]),
+            )
 
     def _batch_complete(self) -> None:
         self.is_processing = False
         self._batch_run_btn.configure(text="▶  Process All", state="normal")
         self._batch_prog.set(1.0)
         n = len(self.batch_files)
-        self._set_status(f"✓  Batch complete — {n} image{'s' if n != 1 else ''} processed", "success")
+        self._set_status(
+            f"✓  Batch complete — {n} image{'s' if n != 1 else ''} processed", "success"
+        )
 
     # ══════════════════════════════════════════════════════════════════
     #  HELPERS
@@ -1036,10 +1175,10 @@ class PixelPeelApp(ctk.CTk):
 
     def _set_status(self, msg: str, kind: str = "ready") -> None:
         dot_color = {
-            "ready":      COLORS["success"],
+            "ready": COLORS["success"],
             "processing": COLORS["warning"],
-            "success":    COLORS["success"],
-            "error":      COLORS["error"],
+            "success": COLORS["success"],
+            "error": COLORS["error"],
         }.get(kind, COLORS["success"])
         self._status_lbl.configure(text=msg)
         self._status_dot.configure(text_color=dot_color)
@@ -1050,42 +1189,48 @@ class PixelPeelApp(ctk.CTk):
             return (255, 255, 255)
         if option == "Custom":
             h = self.bg_hex.lstrip("#")
-            return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))  # type: ignore[return-value]
-        return None   # Transparent
+            return tuple(int(h[i : i + 2], 16) for i in (0, 2, 4))  # type: ignore[return-value]
+        return None  # Transparent
 
     @staticmethod
     def _fit(img: Image.Image, W: int, H: int) -> Image.Image:
         """Resize *img* to fit inside W×H preserving aspect ratio."""
         iw, ih = img.size
-        scale  = min(W / iw, H / ih, 1.0)
-        return img.resize((max(1, int(iw * scale)), max(1, int(ih * scale))), Image.LANCZOS)
+        scale = min(W / iw, H / ih, 1.0)
+        return img.resize(
+            (max(1, int(iw * scale)), max(1, int(ih * scale))), Image.LANCZOS
+        )
 
     @staticmethod
     def _checkerboard(W: int, H: int, cell: int = 12) -> Image.Image:
         """Generate a grey checkerboard RGBA image at W×H."""
         try:
             import numpy as np
+
             xs, ys = np.arange(W) // cell, np.arange(H) // cell
             xg, yg = np.meshgrid(xs, ys)
             mask = ((xg + yg) % 2).astype(bool)
-            arr  = np.zeros((H, W, 4), dtype=np.uint8)
-            arr[ mask] = [205, 205, 205, 255]
+            arr = np.zeros((H, W, 4), dtype=np.uint8)
+            arr[mask] = [205, 205, 205, 255]
             arr[~mask] = [165, 165, 165, 255]
             return Image.fromarray(arr, "RGBA")
         except ImportError:
             img = Image.new("RGBA", (W, H))
-            px  = img.load()
+            px = img.load()
             for y in range(H):
                 for x in range(W):
-                    px[x, y] = (205, 205, 205, 255) if ((x // cell) + (y // cell)) % 2 == 0 \
-                               else (165, 165, 165, 255)
+                    px[x, y] = (
+                        (205, 205, 205, 255)
+                        if ((x // cell) + (y // cell)) % 2 == 0
+                        else (165, 165, 165, 255)
+                    )
             return img
 
     @staticmethod
     def _fmt_size(n: int) -> str:
         if n < 1024:
             return f"{n} B"
-        if n < 1024 ** 2:
+        if n < 1024**2:
             return f"{n // 1024} KB"
         return f"{n / 1024**2:.1f} MB"
 

@@ -64,7 +64,7 @@ include = ["src*"]
 # ─────────────────────────────────────────────────────────────
 [tool.black]
 line-length    = 90
-target-version = ["py39", "py310", "py311", "py312"]
+target-version = ["py311"]
 
 [tool.ruff]
 line-length = 90
