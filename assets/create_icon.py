@@ -93,7 +93,7 @@ def create_icons(out_path: str | Path) -> None:
         # .png (Linux)
         _make_base(256).save(str(out), "PNG")
 
-    print(f"  ✓  Icon written → {out}")
+    print(f"  [OK]  Icon written -> {out}")
 
 
 if __name__ == "__main__":
