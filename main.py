@@ -28,9 +28,9 @@ def check_dependencies():
             missing.append(package)
 
     if missing:
-        print("\n❌  Missing dependencies detected:\n")
+        print("\n[ERROR]  Missing dependencies:\n")
         for pkg in missing:
-            print(f"   • {pkg}")
+            print(f"   - {pkg}")
         print(f"\n   Run:  pip install {' '.join(p.split('>=')[0] for p in missing)}\n")
         sys.exit(1)
 

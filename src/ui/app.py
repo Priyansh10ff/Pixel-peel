@@ -151,7 +151,7 @@ class PixelPeelApp(ctk.CTk):
 
         ctk.CTkLabel(
             lf,
-            text="AI Background Remover",
+            text="Background Remover",
             font=ctk.CTkFont(size=11),
             text_color=COLORS["subtext"],
         ).grid(row=1, column=0, sticky="w")

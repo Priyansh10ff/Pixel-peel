@@ -1,6 +1,6 @@
 [build-system]
 requires      = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 # ─────────────────────────────────────────────────────────────
 [project]
@@ -52,9 +52,9 @@ dev = [
 pixelpeel = "main:main"
 
 [project.urls]
-Homepage      = "https://github.com/yourusername/pixelpeel"
-Repository    = "https://github.com/yourusername/pixelpeel"
-"Bug Tracker" = "https://github.com/yourusername/pixelpeel/issues"
+Homepage      = "https://github.com/Priyansh10ff/pixelpeel"
+Repository    = "https://github.com/Priyansh10ff/pixelpeel"
+"Bug Tracker" = "https://github.com/Priyansh10ff/pixelpeel/issues"
 
 # ─────────────────────────────────────────────────────────────
 [tool.setuptools.packages.find]
